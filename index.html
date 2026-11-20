@@ -1,0 +1,1268 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#091522">
+  <meta name="description" content="Un portal interactivo de prevención sísmica para comunidades escolares de Venezuela. Aprende, prepárate y actúa con calma.">
+  <title>Territorio Seguro — Prevención sísmica escolar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: "#091522",
+            navy: "#10243a",
+            slateblue: "#60768a",
+            paper: "#f5f7f8",
+            safety: "#f4a94f",
+            mint: "#a9d8c8"
+          },
+          fontFamily: {
+            sans: ["DM Sans", "sans-serif"],
+            display: ["Manrope", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #091522;
+      --navy: #10243a;
+      --muted: #647587;
+      --accent: #f4a94f;
+      --mint: #a9d8c8;
+      --paper: #f5f7f8;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 92px; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "DM Sans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
+      outline: 3px solid #e89a35;
+      outline-offset: 4px;
+    }
+    .font-display { font-family: "Manrope", sans-serif; }
+    .site-nav {
+      background: rgba(9, 21, 34, .82);
+      border-bottom: 1px solid rgba(255,255,255,.09);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+    #contenido > section:not(#inicio):not(#historia):not(#quiz):not(#recursos) { display: none; }
+    #historia { padding-top: 6rem; padding-bottom: 3.5rem; }
+    #recursos { padding-top: 3.5rem; padding-bottom: 3.5rem; }
+    footer { display: none; }
+    .hero-grid {
+      background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 58px 58px;
+      mask-image: linear-gradient(to bottom, black, transparent 92%);
+    }
+    .hero-glow {
+      background: radial-gradient(ellipse at 68% 47%, rgba(80, 139, 151, .19), transparent 49%), radial-gradient(ellipse at 92% 17%, rgba(244, 169, 79, .10), transparent 32%);
+    }
+    .soft-card {
+      transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+    }
+    .soft-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 48px rgba(16, 36, 58, .11);
+      border-color: rgba(244, 169, 79, .55);
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .65s ease, transform .65s cubic-bezier(.2,.7,.2,1);
+    }
+    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+    .timeline-line {
+      background: linear-gradient(to bottom, #f4a94f 0%, #d7e1e6 88%, transparent 100%);
+    }
+    .timeline-item { transition: opacity .25s ease, transform .25s ease; }
+    .timeline-item.is-muted { opacity: .43; transform: scale(.985); }
+    .event-details[hidden] { display: none; }
+    .map-grid {
+      background-image: linear-gradient(rgba(16,36,58,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(16,36,58,.045) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .map-zone { transition: transform .25s ease, filter .25s ease, opacity .25s ease; transform-origin: center; }
+    .map-zone.is-active { transform: scale(1.035); filter: saturate(1.25); }
+    .map-zone:not(.is-active) { opacity: .55; }
+    .protocol-tab[aria-selected="true"] {
+      color: var(--ink);
+      background: #fff;
+      box-shadow: 0 4px 14px rgba(16, 36, 58, .08);
+    }
+    .protocol-panel[hidden] { display: none; }
+    .protocol-panel:not([hidden]) { animation: panelPop .35s ease-out; }
+    @keyframes panelPop { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .map-filter { transition: transform .2s ease, box-shadow .2s ease; }
+    .map-filter:hover { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(16,36,58,.12); }
+    .quiz-option { transition: border-color .2s ease, background .2s ease, transform .2s ease; }
+    .quiz-option:hover:not(:disabled) { transform: translateY(-2px); border-color: #e7a14a; }
+    .quiz-option:active:not(:disabled) { transform: scale(.985); }
+    .quiz-option:disabled { cursor: default; }
+    .quiz-option.is-correct { border-color: #53a587; background: #eff8f4; }
+    .quiz-option.is-wrong { border-color: #d77865; background: #fff4f1; }
+    .quiz-option.is-correct, .quiz-option.is-wrong { color: var(--ink); }
+    .prep-task.is-complete { border-color: #70ad8d; background: #eff8f4; }
+    .progress-fill { transition: width .45s ease; }
+    .event-dialog {
+      width: min(94vw, 760px);
+      max-width: none;
+      max-height: 90vh;
+      padding: 0;
+      border: 0;
+      border-radius: 1.5rem;
+      color: var(--ink);
+      box-shadow: 0 28px 90px rgba(0,0,0,.32);
+    }
+    .event-dialog::backdrop { background: rgba(5, 15, 25, .78); backdrop-filter: blur(5px); }
+    .event-illustration { display: block; width: 100%; max-height: 48vh; object-fit: contain; background: #18344d; }
+    .event-gallery-controls[hidden] { display: none; }
+    .sim-student { transform-box: fill-box; transform-origin: center bottom; transition: transform .65s cubic-bezier(.2,.7,.2,1); }
+    .sim-student-secondary { transform-box: fill-box; transform-origin: center bottom; animation: studentBob 2.8s ease-in-out infinite; }
+    .sim-student-secondary.delay { animation-delay: -1.4s; }
+    .sim-teacher { transform-box: fill-box; transform-origin: center bottom; animation: teacherMove 4s ease-in-out infinite; }
+    .simulator-scene[data-action="run"] .sim-student { transform: translate(35px,-8px) rotate(12deg); }
+    .simulator-scene[data-action="cover"] .sim-student { transform: translateY(25px) scale(.82); }
+    .simulator-scene[data-action="window"] .sim-student { transform: translateX(-44px); }
+    .simulator-scene[data-action="evacuate"] .sim-student { transform: translate(70px,-7px); }
+    .simulator-scene[data-action="belongings"] .sim-student { transform: translate(24px,5px) scale(.94); }
+    .simulator-scene.is-shaking { animation: strongCameraShake 2.2s ease-in-out infinite; }
+    .simulator-scene[data-action="elevator"][data-motion="exit"] .sim-student { animation: runToExit 1.1s ease-in-out forwards; }
+    .simulator-scene[data-action="elevator"][data-motion="hallway"] .sim-student { transform: translate(85px,0); }
+    .simulator-scene[data-action="elevator"][data-motion="search"] .sim-student { animation: searchElevator 1s ease-in-out forwards; }
+    .simulator-scene[data-action="elevator"][data-motion="inside"] .sim-student { transform: translate(115px,0); }
+    .simulator-scene[data-action="elevator"][data-motion="inside"] .sim-elevator-door-left { transform: translateX(0); }
+    .simulator-scene[data-action="elevator"][data-motion="inside"] .sim-elevator-door-right { transform: translateX(0); }
+    .simulator-scene[data-action="elevator"][data-motion="hallway"] .sim-room-element,
+    .simulator-scene[data-action="elevator"][data-motion="search"] .sim-room-element,
+    .simulator-scene[data-action="elevator"][data-motion="inside"] .sim-room-element { display: none; }
+    .simulator-scene[data-action="elevator"][data-motion="hallway"] .sim-hallway-scene,
+    .simulator-scene[data-action="elevator"][data-motion="search"] .sim-hallway-scene,
+    .simulator-scene[data-action="elevator"][data-motion="inside"] .sim-hallway-scene { display: inline; }
+    .simulator-scene[data-action="elevator"][data-motion="hallway"] .sim-student-secondary,
+    .simulator-scene[data-action="elevator"][data-motion="search"] .sim-student-secondary,
+    .simulator-scene[data-action="elevator"][data-motion="inside"] .sim-student-secondary,
+    .simulator-scene[data-action="elevator"][data-motion="hallway"] .sim-teacher,
+    .simulator-scene[data-action="elevator"][data-motion="search"] .sim-teacher,
+    .simulator-scene[data-action="elevator"][data-motion="inside"] .sim-teacher { display: none; }
+    .sim-hallway-scene { display: none; }
+    .sim-elevator-door-left, .sim-elevator-door-right { transform-box: fill-box; transition: transform .6s ease; }
+    .sim-elevator-door-left { transform-origin: left center; }
+    .sim-elevator-door-right { transform-origin: right center; }
+    .simulator-scene[data-action="elevator"]:not([data-motion="inside"]) .sim-elevator-door-left { transform: translateX(-32px); }
+    .simulator-scene[data-action="elevator"]:not([data-motion="inside"]) .sim-elevator-door-right { transform: translateX(32px); }
+    .sim-school-items { display: none; }
+    .simulator-scene[data-action="belongings"] .sim-school-items { display: inline; }
+    .simulator-scene[data-motion="pickup"] .sim-school-items { animation: collectSchoolItems .75s ease-in forwards; }
+    .simulator-scene[data-motion="picked-up"] .sim-school-items { transform: translate(-42px,-44px); }
+    .simulator-scene[data-action="separate"] .sim-student { transform: translate(56px,-5px); }
+    .simulator-scene[data-action="stay"] .sim-student { transform: translateY(-4px); }
+    .simulator-scene[data-action="return"] .sim-student { transform: translate(-54px,0); }
+    .sim-plaza-scene { display: none; }
+    .simulator-scene[data-scene="plaza"] .sim-room-element { display: none; }
+    .simulator-scene[data-scene="plaza"] .sim-plaza-scene { display: inline; }
+    .sim-evacuees { display: none; }
+    .simulator-scene[data-scene="plaza"] .sim-evacuees { display: inline; }
+    .sim-evacuee { animation: walkToPlaza 3.2s ease-in-out both; }
+    .sim-evacuee:nth-child(2) { animation-delay: .35s; }
+    .sim-evacuee:nth-child(3) { animation-delay: .7s; }
+    .evacuee-body { transform-box: fill-box; transform-origin: center bottom; animation: littleStep .24s ease-in-out infinite alternate; }
+    .evacuee-legs { transform-box: fill-box; transform-origin: center top; animation: littleLegs .24s ease-in-out infinite alternate; }
+    .simulator-scene[data-scene="plaza"] .sim-student { translate: 45px 0; }
+    .simulator-scene[data-scene="plaza"] .sim-student-secondary { translate: 18px 0; }
+    .simulator-scene[data-scene="plaza"] .sim-student-secondary.delay { translate: 10px 0; }
+    .simulator-scene[data-scene="plaza"] .sim-teacher { translate: -152px 0; }
+    .simulator-scene[data-scene="plaza"][data-action="separate"] .sim-student { transform: translate(90px,-5px); }
+    .simulator-scene[data-scene="plaza"][data-action="stay"] .sim-student { transform: translateY(-4px); }
+    .simulator-scene[data-scene="plaza"][data-action="return"] .sim-student { transform: translate(-175px,0); }
+    @keyframes studentBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    @keyframes walkToPlaza { 0%,12% { translate: 0 0; } 85% { translate: 105px -2px; } 100% { translate: 120px 0; } }
+    @keyframes littleStep { to { transform: translateY(-1px); } }
+    @keyframes littleLegs { to { transform: rotate(12deg); } }
+    @keyframes strongCameraShake {
+      0%,100% { transform: translate(0,0) rotate(0); }
+      12% { transform: translate(-1px,1px) rotate(-.15deg); }
+      24% { transform: translate(1px,-1px) rotate(.2deg); }
+      36% { transform: translate(-3px,2px) rotate(-.4deg); }
+      48% { transform: translate(4px,-2px) rotate(.6deg); }
+      60% { transform: translate(-6px,3px) rotate(-.9deg); }
+      70% { transform: translate(8px,-4px) rotate(1.2deg); }
+      78% { transform: translate(-9px,-3px) rotate(-1.4deg); }
+      86% { transform: translate(8px,5px) rotate(1.2deg); }
+      93% { transform: translate(-7px,3px) rotate(-1deg); }
+    }
+    @keyframes runToExit { 0% { transform: translate(0,0); } 18% { transform: translate(16px,-5px) rotate(-5deg); } 38% { transform: translate(42px,0) rotate(4deg); } 60% { transform: translate(65px,-5px) rotate(-4deg); } 82%,100% { transform: translate(85px,0); } }
+    @keyframes searchElevator { 0%,20% { transform: translate(85px,0); } 38% { transform: translate(88px,-3px) rotate(-3deg); } 55% { transform: translate(88px,0) rotate(3deg); } 100% { transform: translate(115px,0); } }
+    @keyframes collectSchoolItems { to { transform: translate(-42px,-44px); } }
+    @keyframes teacherMove { 0%,100% { transform: rotate(0); } 50% { transform: rotate(-3deg); } }
+    .float-slow { animation: float 7s ease-in-out infinite; }
+    .pulse-soft { animation: pulseSoft 3.2s ease-in-out infinite; }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    @keyframes pulseSoft { 0%,100% { box-shadow: 0 0 0 0 rgba(244,169,79,.2); } 50% { box-shadow: 0 0 0 10px rgba(244,169,79,0); } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#contenido" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-white focus:px-4 focus:py-3 focus:text-ink">Saltar al contenido</a>
+
+  <header class="site-nav fixed inset-x-0 top-0 z-50 text-white">
+    <nav class="mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-2 px-3 sm:px-8" aria-label="Navegación principal">
+      <a href="#inicio" class="flex items-center gap-3" aria-label="Territorio Seguro, inicio">
+        <span class="grid h-10 w-10 place-items-center rounded-xl border border-white/15 bg-white/[.08] text-safety">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5M5.5 10v9h13v-9M9 19v-5h6v5M2 14h3m14 0h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 7.5v3.2m0 2v.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </span>
+        <span class="font-display text-[15px] font-extrabold tracking-tight">territorio<span class="text-safety">seguro</span></span>
+      </a>
+      <div class="flex items-center gap-2 text-xs font-bold sm:gap-4">
+        <a href="#historia" class="whitespace-nowrap rounded-full px-3 py-2 text-white/80 transition hover:bg-white/10 hover:text-white"><span class="sm:hidden">Historia</span><span class="hidden sm:inline">Línea del tiempo</span></a>
+        <a href="#recursos" class="whitespace-nowrap rounded-full bg-safety px-3 py-2 text-ink transition hover:bg-[#ffc26e]"><span class="sm:hidden">Reto</span><span class="hidden sm:inline">Reto escolar</span></a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="contenido">
+    <section id="inicio" class="relative isolate min-h-[720px] overflow-hidden bg-ink pt-[68px] text-white lg:min-h-[780px]">
+      <div class="hero-grid absolute inset-0 -z-10 opacity-60"></div>
+      <div class="hero-glow absolute inset-0 -z-10"></div>
+      <div class="mx-auto grid min-h-[644px] max-w-7xl items-center gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1.03fr_.97fr] lg:py-16">
+        <div class="relative z-10 max-w-2xl">
+          <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[.055] px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[.15em] text-white/75">
+            <span class="h-1.5 w-1.5 rounded-full bg-safety"></span>
+            Una misión para toda la clase
+          </div>
+          <h1 class="font-display text-[clamp(2.8rem,6.1vw,5.25rem)] font-extrabold leading-[1.04] tracking-[-.055em]">
+            Terremotos y<br><span class="text-safety">tu escuela.</span>
+          </h1>
+          <p class="mt-3 max-w-lg text-base leading-7 text-slate-300">
+            Mira la historia. Luego, cumple el reto de tu escuela.
+          </p>
+          <div class="mt-5 flex flex-wrap items-center gap-3">
+            <a href="#historia" class="inline-flex items-center gap-2 rounded-full bg-safety px-5 py-3 text-sm font-bold text-ink transition hover:-translate-y-0.5 hover:bg-[#ffc26e]">
+              Ver terremotos
+              <span aria-hidden="true">↓</span>
+            </a>
+            <a href="#recursos" class="rounded-full border border-white/20 px-5 py-3 text-sm font-semibold text-white/85 transition hover:bg-white/10">Hacer el reto <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="mt-12 flex items-center gap-4 border-t border-white/10 pt-6">
+            <div class="flex -space-x-2" aria-hidden="true">
+              <span class="grid h-9 w-9 place-items-center rounded-full border-2 border-ink bg-[#d6e8df] text-xs font-bold text-ink">E</span>
+              <span class="grid h-9 w-9 place-items-center rounded-full border-2 border-ink bg-[#f7d8ab] text-xs font-bold text-ink">D</span>
+              <span class="grid h-9 w-9 place-items-center rounded-full border-2 border-ink bg-[#c4d2e3] text-xs font-bold text-ink">F</span>
+            </div>
+            <p class="text-xs leading-5 text-slate-400"><strong class="font-semibold text-white">Mira · practica · aprende</strong><br>¡Tú también puedes ayudar!</p>
+          </div>
+        </div>
+
+        <div class="relative mx-auto w-full max-w-[560px] lg:max-w-none">
+          <div class="absolute -left-2 top-[17%] z-10 hidden rounded-2xl border border-white/10 bg-[#13283b]/90 p-3.5 shadow-2xl backdrop-blur-md sm:block float-slow">
+            <div class="flex items-center gap-3">
+              <span class="grid h-10 w-10 place-items-center rounded-xl bg-safety/15 text-safety">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 4.5 6v5.3c0 4.6 3.2 8.4 7.5 9.7 4.3-1.3 7.5-5.1 7.5-9.7V6L12 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span><span class="block text-xs font-bold">Prepararse es protegerse</span><span class="mt-1 block text-[10px] text-slate-400">La prevención empieza hoy</span></span>
+            </div>
+          </div>
+          <div class="absolute -right-2 bottom-[12%] z-10 hidden rounded-2xl border border-white/10 bg-[#13283b]/90 px-4 py-3 shadow-2xl backdrop-blur-md sm:block float-slow" style="animation-delay:-3.5s">
+            <div class="flex items-center gap-2.5">
+              <span class="h-2 w-2 rounded-full bg-mint pulse-soft"></span>
+              <span class="text-xs font-semibold text-white/90">Con calma. En comunidad.</span>
+            </div>
+          </div>
+          <div class="overflow-hidden rounded-[2rem] border border-white/10 bg-[#102338] shadow-[0_35px_90px_rgba(0,0,0,.4)]">
+            <svg viewBox="0 0 620 540" class="block w-full" role="img" aria-labelledby="hero-illustration-title hero-illustration-desc">
+              <title id="hero-illustration-title">Escuela protegida entre montañas venezolanas</title>
+              <desc id="hero-illustration-desc">Ilustración de una escuela, montañas y ondas concéntricas que representan preparación y prevención.</desc>
+              <defs>
+                <linearGradient id="sky" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#18344d"/><stop offset="1" stop-color="#102338"/></linearGradient>
+                <linearGradient id="hill" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#31566a"/><stop offset="1" stop-color="#1b3d51"/></linearGradient>
+                <linearGradient id="building" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#edf0e9"/><stop offset="1" stop-color="#cfdad5"/></linearGradient>
+                <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="#ffffff" opacity=".12"/></pattern>
+              </defs>
+              <rect width="620" height="540" fill="url(#sky)"/>
+              <rect width="620" height="540" fill="url(#dots)" opacity=".55"/>
+              <circle cx="482" cy="123" r="82" fill="#f4a94f" opacity=".08"/>
+              <circle cx="482" cy="123" r="52" fill="none" stroke="#f4a94f" stroke-opacity=".22"/>
+              <circle cx="482" cy="123" r="31" fill="#f4a94f" opacity=".12"/>
+              <path d="M0 308 111 183l84 88 111-138 117 147 84-74 113 105v229H0Z" fill="#223f53"/>
+              <path d="m0 360 132-105 91 89 105-123 114 130 75-81 103 85v185H0Z" fill="url(#hill)"/>
+              <path d="M0 389c91-41 142-18 223 5 88 25 139-22 221-26 72-4 123 26 176 50v122H0Z" fill="#19384a"/>
+              <path d="m333 263 23-63 25 62-24-11Z" fill="#688391" opacity=".7"/>
+              <path d="m74 278 38-79 32 77-30-13Z" fill="#587586" opacity=".7"/>
+              <path d="m112 200 11-22 11 22-12-5Z" fill="#d3e2e2" opacity=".6"/>
+              <path d="M168 350h280v144H168z" fill="url(#building)"/>
+              <path d="m148 351 160-100 160 100Z" fill="#e6a14e"/>
+              <path d="M158 351h300" stroke="#f8c677" stroke-width="5"/>
+              <path d="M197 379h37v40h-37zM266 379h37v40h-37zM335 379h37v40h-37zM404 379h27v40h-27z" fill="#426376"/>
+              <path d="M296 430h32v64h-32z" fill="#233d4d"/>
+              <circle cx="321" cy="462" r="2" fill="#f4a94f"/>
+              <path d="M151 493h314" stroke="#f4a94f" stroke-width="4" stroke-linecap="round"/>
+              <path d="M171 493v14m273-14v14" stroke="#f4a94f" stroke-width="3" stroke-linecap="round"/>
+              <path d="M211 342v-16m93 16v-16m93 16v-16" stroke="#f5f7f3" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="211" cy="322" r="4" fill="#f4a94f"/><circle cx="304" cy="322" r="4" fill="#a9d8c8"/><circle cx="397" cy="322" r="4" fill="#f4a94f"/>
+              <path d="M115 458c10-20 23-20 33 0m-39 0c13-34 34-34 47 0" fill="none" stroke="#a9d8c8" stroke-opacity=".65" stroke-width="2"/>
+              <path d="M471 454c12-23 27-23 39 0m-46 0c16-38 39-38 55 0" fill="none" stroke="#a9d8c8" stroke-opacity=".65" stroke-width="2"/>
+              <rect x="34" y="34" width="112" height="27" rx="13.5" fill="#ffffff" fill-opacity=".08" stroke="#ffffff" stroke-opacity=".15"/>
+              <circle cx="50" cy="47.5" r="3" fill="#f4a94f"/>
+              <text x="60" y="51" fill="#e8eef1" font-family="DM Sans, sans-serif" font-size="10" font-weight="600" letter-spacing="1">PREVENCIÓN</text>
+            </svg>
+          </div>
+          <div class="mt-4 flex items-center justify-between px-1 text-[10px] uppercase tracking-[.15em] text-slate-500">
+            <span>Conocimiento que construye resiliencia</span><span>01 — 05</span>
+          </div>
+        </div>
+      </div>
+      <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent"></div>
+    </section>
+
+    <section class="bg-white py-8" aria-label="Principios de prevención">
+      <div class="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-5 sm:px-8 md:grid-cols-4 md:gap-0">
+        <div class="flex items-center gap-3 md:border-r md:border-slate-200 md:px-7 md:first:pl-0">
+          <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#f7f1e8] text-[#c9822e]"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 4.5 6v5.3c0 4.6 3.2 8.4 7.5 9.7 4.3-1.3 7.5-5.1 7.5-9.7V6L12 3Z" stroke="currentColor" stroke-width="1.6"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+          <span class="text-xs font-semibold leading-5 text-navy">Conoce<br><span class="font-normal text-slateblue">tu escuela</span></span>
+        </div>
+        <div class="flex items-center gap-3 md:border-r md:border-slate-200 md:px-7">
+          <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#eaf2f4] text-[#426b78]"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 20h18M5 20V9l7-5 7 5v11M9 20v-6h6v6M8 10h.01M16 10h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="text-xs font-semibold leading-5 text-navy">Agáchate<br><span class="font-normal text-slateblue">y cúbrete</span></span>
+        </div>
+        <div class="flex items-center gap-3 md:border-r md:border-slate-200 md:px-7">
+          <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#edf4ef] text-[#53806f]"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m6-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm12 10v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+          <span class="text-xs font-semibold leading-5 text-navy">Sal en grupo<br><span class="font-normal text-slateblue">sin correr</span></span>
+        </div>
+        <div class="flex items-center gap-3 md:px-7 md:pr-0">
+          <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#f4eff4] text-[#8d668b]"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" stroke="currentColor" stroke-width="1.6"/><path d="M8 7h8m-8 4h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+          <span class="text-xs font-semibold leading-5 text-navy">Sigue<br><span class="font-normal text-slateblue">a tu profe</span></span>
+        </div>
+      </div>
+    </section>
+
+    <section id="historia" class="bg-paper py-24 sm:py-28">
+      <div class="mx-auto max-w-7xl px-5 sm:px-8">
+        <div class="reveal mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+          <div>
+            <p class="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.19em] text-[#bd7a2c]"><span class="h-px w-7 bg-safety"></span> Viaje en el tiempo</p>
+            <h2 class="font-display text-3xl font-extrabold tracking-[-.045em] text-ink sm:text-4xl">Terremotos en Venezuela</h2>
+          </div>
+          <p class="max-w-md text-sm leading-6 text-slateblue">Toca una tarjeta para ver imágenes y conocer qué pasó.</p>
+        </div>
+
+        <div class="reveal mb-8 flex flex-wrap gap-2" role="group" aria-label="Filtrar eventos históricos">
+          <button type="button" class="timeline-filter rounded-full border border-ink bg-ink px-4 py-2 text-xs font-semibold text-white" data-filter="all" aria-pressed="true">Todos los eventos</button>
+          <button type="button" class="timeline-filter rounded-full border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-500" data-filter="caracas" aria-pressed="false">Caracas</button>
+          <button type="button" class="timeline-filter rounded-full border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-500" data-filter="oriente" aria-pressed="false">Oriente</button>
+        </div>
+
+        <div class="relative">
+          <div class="timeline-line absolute bottom-8 left-[19px] top-8 w-px md:left-1/2"></div>
+          <div class="space-y-5">
+            <article class="timeline-item reveal relative grid gap-4 md:grid-cols-2 md:gap-14" data-region="caracas">
+              <div class="absolute left-[13px] top-7 z-10 h-3.5 w-3.5 rounded-full border-[3px] border-paper bg-safety shadow-[0_0_0_4px_rgba(244,169,79,.16)] md:left-[calc(50%-6px)]"></div>
+              <div class="pl-12 md:pr-12 md:text-right"><span class="font-display text-sm font-extrabold tracking-wide text-[#bf7b2e]">1812</span></div>
+              <button type="button" class="timeline-card soft-card group w-full rounded-2xl border border-slate-200 bg-white p-5 text-left md:col-start-2 md:row-start-1" aria-expanded="false" aria-controls="event-1812">
+                <span class="flex items-start justify-between gap-3">
+                  <span><span class="block font-display text-lg font-bold text-ink">Terremotos de Caracas</span><span class="mt-1 block text-xs text-slate-500">26 de marzo · Caracas y otras ciudades</span><span class="mt-2 block text-xs font-semibold text-[#bd7a2c]">Magnitud estimada: ≈7,7 · estimación histórica</span></span>
+                  <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-paper text-slateblue transition group-hover:bg-[#fff3e2]" aria-hidden="true">+</span>
+                </span>
+                <span id="event-1812" class="event-details mt-3 block text-sm leading-6 text-slateblue" hidden>La cifra de ≈7,7 es una estimación retrospectiva: en 1812 no existían instrumentos modernos para medir la magnitud, por lo que las reconstrucciones históricas varían. Los sismos del Jueves Santo afectaron gravemente Caracas y otras poblaciones.</span>
+              </button>
+            </article>
+            <article class="timeline-item reveal relative grid gap-4 md:grid-cols-2 md:gap-14" data-region="caracas">
+              <div class="absolute left-[13px] top-7 z-10 h-3.5 w-3.5 rounded-full border-[3px] border-paper bg-[#8da4ad] md:left-[calc(50%-6px)]"></div>
+              <div class="pl-12 md:pr-12 md:text-right"><span class="font-display text-sm font-extrabold tracking-wide text-slateblue">1900</span></div>
+              <button type="button" class="timeline-card soft-card group w-full rounded-2xl border border-slate-200 bg-white p-5 text-left md:col-start-2 md:row-start-1" aria-expanded="false" aria-controls="event-1900">
+                <span class="flex items-start justify-between gap-3">
+                  <span><span class="block font-display text-lg font-bold text-ink">Sismo de Caracas</span><span class="mt-1 block text-xs text-slate-500">29 de octubre · Región central</span><span class="mt-2 block text-xs font-semibold text-[#bd7a2c]">Magnitud: 7,7 Mw · USGS</span></span>
+                  <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-paper text-slateblue transition group-hover:bg-[#fff3e2]" aria-hidden="true">+</span>
+                </span>
+                <span id="event-1900" class="event-details mt-3 block text-sm leading-6 text-slateblue" hidden>Un terremoto afectó Caracas y localidades cercanas. Estudiar los eventos pasados ayuda a comprender que la preparación debe adaptarse al entorno y a las características de cada comunidad.</span>
+              </button>
+            </article>
+            <article class="timeline-item reveal relative grid gap-4 md:grid-cols-2 md:gap-14" data-region="caracas">
+              <div class="absolute left-[13px] top-7 z-10 h-3.5 w-3.5 rounded-full border-[3px] border-paper bg-[#8da4ad] md:left-[calc(50%-6px)]"></div>
+              <div class="pl-12 md:pr-12 md:text-right"><span class="font-display text-sm font-extrabold tracking-wide text-slateblue">1967</span></div>
+              <button type="button" class="timeline-card soft-card group w-full rounded-2xl border border-slate-200 bg-white p-5 text-left md:col-start-2 md:row-start-1" aria-expanded="false" aria-controls="event-1967">
+                <span class="flex items-start justify-between gap-3">
+                  <span><span class="block font-display text-lg font-bold text-ink">Terremoto de Caracas</span><span class="mt-1 block text-xs text-slate-500">29 de julio · Caracas y litoral central</span><span class="mt-2 block text-xs font-semibold text-[#bd7a2c]">Magnitud: 6,6 Mw · USGS</span></span>
+                  <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-paper text-slateblue transition group-hover:bg-[#fff3e2]" aria-hidden="true">+</span>
+                </span>
+                <span id="event-1967" class="event-details mt-3 block text-sm leading-6 text-slateblue" hidden>El sismo de 1967 dejó una huella profunda en la capital y su litoral. La experiencia impulsó reflexión sobre las construcciones, la respuesta de emergencia y la educación preventiva.</span>
+              </button>
+            </article>
+            <article class="timeline-item reveal relative grid gap-4 md:grid-cols-2 md:gap-14" data-region="oriente">
+              <div class="absolute left-[13px] top-7 z-10 h-3.5 w-3.5 rounded-full border-[3px] border-paper bg-[#8da4ad] md:left-[calc(50%-6px)]"></div>
+              <div class="pl-12 md:pr-12 md:text-right"><span class="font-display text-sm font-extrabold tracking-wide text-slateblue">1997</span></div>
+              <button type="button" class="timeline-card soft-card group w-full rounded-2xl border border-slate-200 bg-white p-5 text-left md:col-start-2 md:row-start-1" aria-expanded="false" aria-controls="event-1997">
+                <span class="flex items-start justify-between gap-3">
+                  <span><span class="block font-display text-lg font-bold text-ink">Terremoto de Cariaco</span><span class="mt-1 block text-xs text-slate-500">9 de julio · Estado Sucre</span><span class="mt-2 block text-xs font-semibold text-[#bd7a2c]">Magnitud: 7,0 Mwc · USGS</span></span>
+                  <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-paper text-slateblue transition group-hover:bg-[#fff3e2]" aria-hidden="true">+</span>
+                </span>
+                <span id="event-1997" class="event-details mt-3 block text-sm leading-6 text-slateblue" hidden>El catálogo del USGS registra Mwc 7,0. Otras referencias pueden redondear o reportar valores distintos según la escala y el método usados. El sismo afectó al estado Sucre y subraya la importancia de la seguridad estructural y la preparación comunitaria.</span>
+              </button>
+            </article>
+            <article class="timeline-item reveal relative grid gap-4 md:grid-cols-2 md:gap-14" data-region="oriente">
+              <div class="absolute left-[13px] top-7 z-10 h-3.5 w-3.5 rounded-full border-[3px] border-paper bg-[#f4a94f] md:left-[calc(50%-6px)]"></div>
+              <div class="pl-12 md:pr-12 md:text-right"><span class="font-display text-sm font-extrabold tracking-wide text-[#bd7a2c]">2026</span></div>
+              <button type="button" class="timeline-card soft-card group w-full rounded-2xl border border-slate-200 bg-white p-5 text-left md:col-start-2 md:row-start-1" aria-expanded="false" aria-controls="event-2026">
+                <span class="flex items-start justify-between gap-3">
+                  <span><span class="block font-display text-lg font-bold text-ink">Doble sismo en Venezuela</span><span class="mt-1 block text-xs text-slate-500">24 de junio · Evento precursor y sismo principal</span><span class="mt-2 block text-xs font-semibold text-[#bd7a2c]">Magnitudes USGS: 7,2 Mww + 7,5 Mww</span></span>
+                  <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-paper text-slateblue transition group-hover:bg-[#fff3e2]" aria-hidden="true">+</span>
+                </span>
+                <span id="event-2026" class="event-details mt-3 block text-sm leading-6 text-slateblue" hidden>El catálogo revisado del USGS registra un evento precursor de magnitud 7,2 seguido por el sismo principal de magnitud 7,5. Consulta los registros enlazados en las fuentes para ver sus ubicaciones y detalles.</span>
+              </button>
+            </article>
+          </div>
+        </div>
+        <details class="mt-5 pl-12 text-[11px] leading-5 text-slate-500 md:pl-0">
+          <summary class="cursor-pointer font-semibold text-slateblue">Fuentes y notas</summary>
+          <p class="mt-2">La magnitud de 1812 es una estimación histórica; las demás incluyen la escala indicada en sus fuentes.</p>
+          <p class="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+            <a class="underline decoration-slate-300 underline-offset-2 hover:text-ink" href="https://doi.org/10.1130/2010.2471(05)" target="_blank" rel="noopener noreferrer">1812 · estudio histórico</a>
+            <a class="underline decoration-slate-300 underline-offset-2 hover:text-ink" href="https://earthquake.usgs.gov/earthquakes/eventpage/cent19001029091100000" target="_blank" rel="noopener noreferrer">1900 · USGS</a>
+            <a class="underline decoration-slate-300 underline-offset-2 hover:text-ink" href="https://earthquake.usgs.gov/earthquakes/eventpage/iscgem833882" target="_blank" rel="noopener noreferrer">1967 · USGS</a>
+            <a class="underline decoration-slate-300 underline-offset-2 hover:text-ink" href="https://earthquake.usgs.gov/earthquakes/eventpage/usp00084m2" target="_blank" rel="noopener noreferrer">1997 · USGS</a>
+            <a class="underline decoration-slate-300 underline-offset-2 hover:text-ink" href="https://earthquake.usgs.gov/earthquakes/eventpage/us6000t7zc" target="_blank" rel="noopener noreferrer">2026 precursor · USGS</a>
+            <a class="underline decoration-slate-300 underline-offset-2 hover:text-ink" href="https://earthquake.usgs.gov/earthquakes/eventpage/us6000t7zp" target="_blank" rel="noopener noreferrer">2026 principal · USGS</a>
+          </p>
+        </details>
+      </div>
+      <dialog id="event-dialog" class="event-dialog" aria-labelledby="event-dialog-title">
+        <div class="relative">
+          <button id="event-dialog-close" type="button" class="absolute right-4 top-4 z-10 grid h-10 w-10 place-items-center rounded-full bg-ink/80 text-xl text-white transition hover:bg-ink" aria-label="Cerrar ficha">×</button>
+          <img id="event-dialog-image" class="event-illustration" alt="">
+          <p id="event-dialog-caption" class="bg-[#f5f7f8] px-6 py-3 text-xs leading-5 text-slateblue sm:px-8"></p>
+          <div id="event-gallery-controls" class="event-gallery-controls flex items-center justify-between bg-[#f5f7f8] px-6 pb-3 sm:px-8" hidden>
+            <button id="event-gallery-previous" type="button" class="rounded-full border border-slate-300 px-4 py-2 text-xs font-bold text-ink transition hover:bg-white">← Anterior</button>
+            <span id="event-gallery-position" class="text-xs font-semibold text-slateblue" aria-live="polite"></span>
+            <button id="event-gallery-next" type="button" class="rounded-full border border-slate-300 px-4 py-2 text-xs font-bold text-ink transition hover:bg-white">Siguiente →</button>
+          </div>
+          <div class="p-6 sm:p-8">
+            <p id="event-dialog-year" class="text-xs font-bold uppercase tracking-[.16em] text-[#bd7a2c]"></p>
+            <h3 id="event-dialog-title" class="mt-2 font-display text-2xl font-extrabold text-ink"></h3>
+            <p id="event-dialog-meta" class="mt-2 text-sm font-semibold text-slateblue"></p>
+            <p id="event-dialog-copy" class="mt-4 text-sm leading-7 text-slateblue"></p>
+            <div class="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-5">
+              <a id="event-dialog-image-source" class="text-[11px] text-slate-500 underline underline-offset-2 hover:text-ink" target="_blank" rel="noopener noreferrer">Fuente de la imagen ↗</a>
+              <a id="event-dialog-source" class="text-xs font-bold text-ink underline underline-offset-4 hover:text-[#bd7a2c]" target="_blank" rel="noopener noreferrer">Consultar fuente sísmica ↗</a>
+            </div>
+          </div>
+        </div>
+      </dialog>
+    </section>
+
+    <section id="mapa" class="bg-white py-24 sm:py-28">
+      <div class="mx-auto max-w-7xl px-5 sm:px-8">
+        <div class="reveal mb-12 max-w-2xl">
+          <p class="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.19em] text-[#bd7a2c]"><span class="h-px w-7 bg-safety"></span> Explora y señala</p>
+          <h2 class="font-display text-3xl font-extrabold tracking-[-.045em] text-ink sm:text-4xl">¿Por dónde salimos<br>de la escuela?</h2>
+          <p class="mt-4 text-sm leading-6 text-slateblue">Toca los botones para explorar el dibujo. Después, busca estos lugares en tu escuela con tu profe.</p>
+        </div>
+
+        <div class="reveal grid gap-8 lg:grid-cols-[1.15fr_.85fr]">
+          <div class="map-grid overflow-hidden rounded-[1.75rem] border border-slate-200 bg-[#f4f7f7] p-4 sm:p-7">
+            <div class="mb-4 flex items-center justify-between">
+              <span class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.12em] text-slate-500">¡Toca y explora!</span>
+              <span class="flex items-center gap-2 text-[10px] text-slate-500"><span class="h-2 w-2 rounded-full bg-[#dd9f5a]"></span>Lugar destacado</span>
+            </div>
+            <svg viewBox="0 0 720 380" class="block w-full" role="img" aria-labelledby="map-title map-desc">
+              <title id="map-title">Esquema ilustrativo para reconocer lugares del entorno escolar</title>
+              <desc id="map-desc">Dibujo esquemático de calles, una escuela, una plaza y zonas para identificar rutas y puntos de encuentro. No representa un mapa oficial.</desc>
+              <rect x="1" y="1" width="718" height="378" rx="22" fill="#edf2f2" stroke="#d8e1e3"/>
+              <path d="M30 90h660M30 267h660M180 25v330M536 25v330" stroke="#fff" stroke-width="27"/>
+              <path d="M30 90h660M30 267h660M180 25v330M536 25v330" stroke="#d5dddf" stroke-width="1.5" stroke-dasharray="7 7"/>
+              <path d="M40 172h116M241 172h283M556 172h124" stroke="#bac8cb" stroke-width="2" stroke-dasharray="5 6"/>
+              <rect class="map-zone is-active" data-map="school" x="262" y="108" width="147" height="102" rx="13" fill="#fff" stroke="#d5dddf" stroke-width="2"/>
+              <path d="m285 145 50-30 50 30v45h-100Z" fill="#d99a4e"/>
+              <path d="M293 145h84v43h-84Z" fill="#dbe8e4"/>
+              <path d="M328 160h14v28h-14Zm-25-3h12v12h-12Zm54 0h12v12h-12Z" fill="#4d6c78"/>
+              <text x="335" y="205" text-anchor="middle" fill="#364f5d" font-family="DM Sans, sans-serif" font-size="11" font-weight="700">ESCUELA</text>
+              <rect class="map-zone" data-map="route" x="427" y="112" width="80" height="75" rx="13" fill="#f7e9d8" stroke="#deb37f" stroke-width="1.5"/>
+              <path d="M445 159c14-30 29-30 44 0m-51 0c18-43 41-43 59 0" fill="none" stroke="#659681" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="466" cy="141" r="6" fill="#659681"/>
+              <text x="467" y="177" text-anchor="middle" fill="#547364" font-family="DM Sans, sans-serif" font-size="9" font-weight="700">PLAZA</text>
+              <rect x="219" y="235" width="180" height="22" rx="11" fill="#d9e8e1"/>
+              <text x="309" y="250" text-anchor="middle" fill="#567465" font-family="DM Sans, sans-serif" font-size="9" font-weight="700">PUNTO DE ENCUENTRO · POR VALIDAR</text>
+              <path class="map-zone" data-map="route" d="M394 160h31v-29h29" fill="none" stroke="#d99a4e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 7"/>
+              <path d="m450 124 9 7-9 7" fill="none" stroke="#d99a4e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect class="map-zone" data-map="safe" x="553" y="107" width="118" height="110" rx="13" fill="#e4efe9" stroke="#c8dbd0" stroke-width="1.5"/>
+              <path d="M574 191v-32l38-25 38 25v32h-76Z" fill="#8fb5a4"/>
+              <path d="M603 191v-21h18v21" fill="#f7f9f6"/>
+              <path d="m582 155 30-20 30 20" fill="none" stroke="#577c6a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <text x="612" y="207" text-anchor="middle" fill="#527465" font-family="DM Sans, sans-serif" font-size="9" font-weight="700">ZONA ABIERTA*</text>
+              <rect x="58" y="119" width="88" height="49" rx="8" fill="#dfe6e8"/><path d="M70 155h64m-50-26h13v14H84Zm25 0h13v14h-13Z" fill="#81959d"/>
+              <rect x="58" y="282" width="85" height="51" rx="8" fill="#e4e9e9"/><path d="M69 321h63m-49-25h13v13H83Zm23 0h13v13h-13Z" fill="#94a7ac"/>
+              <rect x="558" y="283" width="109" height="46" rx="8" fill="#e1e9e5"/><path d="M570 317h83m-65-21h14v13h-14Zm27 0h14v13h-14Z" fill="#77988b"/>
+              <circle cx="243" cy="61" r="4" fill="#d9a25e"/><circle cx="468" cy="303" r="4" fill="#d9a25e"/>
+              <text x="44" y="352" fill="#748891" font-family="DM Sans, sans-serif" font-size="9">*La zona segura debe verificarse según el plan local y las indicaciones oficiales.</text>
+            </svg>
+            <div class="mt-4 flex flex-wrap gap-2" role="group" aria-label="Destacar elementos del esquema">
+              <button type="button" class="map-filter rounded-full bg-ink px-3.5 py-2 text-xs font-semibold text-white" data-map-filter="school" aria-pressed="true">🏫 Escuela</button>
+              <button type="button" class="map-filter rounded-full bg-white px-3.5 py-2 text-xs font-semibold text-slate-600 ring-1 ring-slate-200" data-map-filter="route" aria-pressed="false">➡️ Camino de salida</button>
+              <button type="button" class="map-filter rounded-full bg-white px-3.5 py-2 text-xs font-semibold text-slate-600 ring-1 ring-slate-200" data-map-filter="safe" aria-pressed="false">🌳 Plaza</button>
+            </div>
+          </div>
+
+          <div class="flex flex-col justify-center">
+            <div id="map-info" class="mb-5 rounded-2xl border border-[#f1dfc8] bg-[#fff9f0] p-5" aria-live="polite">
+              <p class="mb-1 text-[10px] font-bold uppercase tracking-[.15em] text-[#bd7a2c]">Explora el esquema</p>
+              <h3 id="map-info-title" class="font-display text-lg font-bold text-ink">La escuela</h3>
+              <p id="map-info-copy" class="mt-2 text-sm leading-6 text-slateblue">Fíjate dónde están las salidas y qué objetos podrían caerse.</p>
+            </div>
+            <ul class="space-y-4">
+              <li class="flex gap-3"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#eef4f1] text-xs font-bold text-[#557d6c]">1</span><span class="text-sm leading-6 text-slateblue"><strong class="text-ink">Busca las salidas</strong> con tu profe.</span></li>
+              <li class="flex gap-3"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#eef4f1] text-xs font-bold text-[#557d6c]">2</span><span class="text-sm leading-6 text-slateblue"><strong class="text-ink">Camina, no corras</strong> cuando toque evacuar.</span></li>
+              <li class="flex gap-3"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#eef4f1] text-xs font-bold text-[#557d6c]">3</span><span class="text-sm leading-6 text-slateblue"><strong class="text-ink">Quédate con tu grupo</strong> en el punto acordado.</span></li>
+            </ul>
+            <p class="mt-5 border-t border-slate-200 pt-4 text-[11px] leading-5 text-slate-500"><strong>Nota:</strong> Este esquema es una ilustración educativa, no un mapa oficial de amenaza sísmica ni una evaluación estructural. Consulta mapas y orientaciones de las autoridades competentes.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="protocolos" class="bg-[#eef2f3] py-24 sm:py-28">
+      <div class="mx-auto max-w-7xl px-5 sm:px-8">
+        <div class="reveal mb-12 grid gap-5 md:grid-cols-[1fr_.7fr] md:items-end">
+          <div>
+            <p class="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.19em] text-[#bd7a2c]"><span class="h-px w-7 bg-safety"></span> Tu plan en tres pasos</p>
+            <h2 class="font-display text-3xl font-extrabold tracking-[-.045em] text-ink sm:text-4xl">Antes, durante<br>y después.</h2>
+          </div>
+          <p class="text-sm leading-6 text-slateblue">Toca cada botón para aprender qué hacer en cada momento.</p>
+        </div>
+
+        <div class="reveal rounded-[1.75rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-7">
+          <div class="mb-6 grid grid-cols-3 gap-2 rounded-2xl bg-[#f1f4f4] p-1.5" role="tablist" aria-label="Momentos del protocolo">
+            <button type="button" id="tab-antes" class="protocol-tab rounded-xl px-2 py-3 text-xs font-bold text-slate-500 sm:text-sm" role="tab" aria-selected="true" aria-controls="panel-antes" tabindex="0">Antes</button>
+            <button type="button" id="tab-durante" class="protocol-tab rounded-xl px-2 py-3 text-xs font-bold text-slate-500 sm:text-sm" role="tab" aria-selected="false" aria-controls="panel-durante" tabindex="-1">Durante</button>
+            <button type="button" id="tab-despues" class="protocol-tab rounded-xl px-2 py-3 text-xs font-bold text-slate-500 sm:text-sm" role="tab" aria-selected="false" aria-controls="panel-despues" tabindex="-1">Después</button>
+          </div>
+
+          <div id="panel-antes" class="protocol-panel" role="tabpanel" aria-labelledby="tab-antes" tabindex="0">
+            <div class="grid gap-8 lg:grid-cols-[.65fr_1.35fr]">
+              <div class="rounded-2xl bg-[#10243a] p-6 text-white sm:p-8">
+                <span class="mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-safety/15 text-safety"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v3m0 12v3M4.6 4.6l2.1 2.1m10.6 10.6 2.1 2.1M3 12h3m12 0h3M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/></svg></span>
+                <p class="text-[10px] font-bold uppercase tracking-[.16em] text-safety">Prepárate hoy</p>
+                <h3 class="mt-2 font-display text-2xl font-extrabold">¡Prepárate con tu clase!</h3>
+                <p class="mt-3 text-sm leading-6 text-slate-300">Conoce el plan y practica con tu profe.</p>
+              </div>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <article class="soft-card rounded-2xl border border-slate-200 p-5">
+                  <span class="text-[10px] font-bold tracking-[.15em] text-[#c27f31]">01</span><h4 class="mt-2 font-display font-bold text-ink">Busca las salidas</h4><p class="mt-2 text-xs leading-5 text-slateblue">Pregunta a tu profe por dónde saldrán y dónde se reunirán.</p>
+                </article>
+                <article class="soft-card rounded-2xl border border-slate-200 p-5">
+                  <span class="text-[10px] font-bold tracking-[.15em] text-[#c27f31]">02</span><h4 class="mt-2 font-display font-bold text-ink">Deja libre el camino</h4><p class="mt-2 text-xs leading-5 text-slateblue">No pongas mochilas ni sillas frente a las puertas.</p>
+                </article>
+                <article class="soft-card rounded-2xl border border-slate-200 p-5">
+                  <span class="text-[10px] font-bold tracking-[.15em] text-[#c27f31]">03</span><h4 class="mt-2 font-display font-bold text-ink">Practica en equipo</h4><p class="mt-2 text-xs leading-5 text-slateblue">Haz los simulacros con calma y ayuda a tus compañeros.</p>
+                </article>
+                <article class="soft-card rounded-2xl border border-slate-200 p-5">
+                </article>
+              </div>
+            </div>
+          </div>
+
+          <div id="panel-durante" class="protocol-panel" role="tabpanel" aria-labelledby="tab-durante" tabindex="0" hidden>
+            <div class="grid gap-8 lg:grid-cols-[.65fr_1.35fr]">
+              <div class="rounded-2xl bg-[#10243a] p-6 text-white sm:p-8">
+                <span class="mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-safety/15 text-safety"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 10.5 12 4l9 6.5v9H3v-9Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 19.5v-6h8v6M5 8.8h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M12 7.5v1m0 1.8v.1" stroke="#f4a94f" stroke-width="2" stroke-linecap="round"/></svg></span>
+                <p class="text-[10px] font-bold uppercase tracking-[.16em] text-safety">Si empieza a temblar</p>
+                <h3 class="mt-2 font-display text-2xl font-extrabold">¡Agáchate y cúbrete!</h3>
+                <p class="mt-3 text-sm leading-6 text-slate-300">Quédate protegido hasta que pare el temblor.</p>
+              </div>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <article class="soft-card rounded-2xl border border-slate-200 p-5"><span class="text-[10px] font-bold tracking-[.15em] text-[#c27f31]">1 · AGÁCHATE</span><h4 class="mt-2 font-display font-bold text-ink">Baja al suelo</h4><p class="mt-2 text-xs leading-5 text-slateblue">Aléjate de las ventanas y de cosas que puedan caer.</p></article>
+                <article class="soft-card rounded-2xl border border-slate-200 p-5"><span class="text-[10px] font-bold tracking-[.15em] text-[#c27f31]">2 · CÚBRETE</span><h4 class="mt-2 font-display font-bold text-ink">Protege tu cabeza</h4><p class="mt-2 text-xs leading-5 text-slateblue">Métete debajo de una mesa firme si está cerca.</p></article>
+                <article class="soft-card rounded-2xl border border-slate-200 p-5"><span class="text-[10px] font-bold tracking-[.15em] text-[#c27f31]">3 · SUJÉTATE</span><h4 class="mt-2 font-display font-bold text-ink">No te sueltes</h4><p class="mt-2 text-xs leading-5 text-slateblue">Quédate ahí hasta que deje de temblar.</p></article>
+                <article class="soft-card rounded-2xl border border-slate-200 p-5"><span class="text-[10px] font-bold tracking-[.15em] text-[#c27f31]">¡RECUERDA!</span><h4 class="mt-2 font-display font-bold text-ink">No salgas corriendo</h4><p class="mt-2 text-xs leading-5 text-slateblue">No uses ascensores ni te acerques a ventanas.</p></article>
+              </div>
+            </div>
+          </div>
+
+          <div id="panel-despues" class="protocol-panel" role="tabpanel" aria-labelledby="tab-despues" tabindex="0" hidden>
+            <div class="grid gap-8 lg:grid-cols-[.65fr_1.35fr]">
+              <div class="rounded-2xl bg-[#10243a] p-6 text-white sm:p-8">
+                <span class="mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-safety/15 text-safety"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 8v4l2.5 2.5M20.5 12a8.5 8.5 0 1 1-2.49-6.01L20.5 8.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.5 3.5v5h-5" stroke="#f4a94f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <p class="text-[10px] font-bold uppercase tracking-[.16em] text-safety">Cuando pare</p>
+                <h3 class="mt-2 font-display text-2xl font-extrabold">Sal con calma.</h3>
+                <p class="mt-3 text-sm leading-6 text-slate-300">Escucha a tu profe. Puede volver a temblar.</p>
+              </div>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <article class="soft-card rounded-2xl border border-slate-200 p-5"><span class="text-[10px] font-bold tracking-[.15em] text-[#c27f31]">1</span><h4 class="mt-2 font-display font-bold text-ink">Espera a tu profe</h4><p class="mt-2 text-xs leading-5 text-slateblue">Sal cuando pare de temblar y te indiquen.</p></article>
+                <article class="soft-card rounded-2xl border border-slate-200 p-5"><span class="text-[10px] font-bold tracking-[.15em] text-[#c27f31]">2</span><h4 class="mt-2 font-display font-bold text-ink">Camina con tu grupo</h4><p class="mt-2 text-xs leading-5 text-slateblue">Sigue el camino acordado. No corras ni uses ascensores.</p></article>
+                <article class="soft-card rounded-2xl border border-slate-200 p-5"><span class="text-[10px] font-bold tracking-[.15em] text-[#c27f31]">3</span><h4 class="mt-2 font-display font-bold text-ink">Quédate en la plaza</h4><p class="mt-2 text-xs leading-5 text-slateblue">No vuelvas al edificio hasta que te den permiso.</p></article>
+                <article class="soft-card rounded-2xl border border-slate-200 p-5"><span class="text-[10px] font-bold tracking-[.15em] text-[#c27f31]">4</span><h4 class="mt-2 font-display font-bold text-ink">Aléjate del peligro</h4><p class="mt-2 text-xs leading-5 text-slateblue">No toques cables ni cosas dañadas. Escucha a los adultos.</p></article>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="mt-5 text-center text-[11px] leading-5 text-slate-500">Haz siempre lo que indique tu profe y el plan de tu escuela.</p>
+      </div>
+    </section>
+
+    <section id="quiz" class="overflow-hidden bg-ink py-14 text-white sm:py-16">
+      <div class="mx-auto max-w-7xl px-5 sm:px-8">
+        <div class="reveal mb-7 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.19em] text-safety"><span class="h-px w-7 bg-safety"></span> ¡Tu misión!</p>
+            <h2 class="font-display text-2xl font-extrabold tracking-[-.04em] sm:text-3xl">Ayuda a la estudiante a estar segura.</h2>
+          </div>
+          <p class="max-w-md text-xs leading-5 text-slate-300">Elige qué hacer. Mira cómo lo intenta y ayúdala a corregirse.</p>
+        </div>
+        <div class="grid gap-5 lg:grid-cols-[1.05fr_.95fr] lg:items-stretch">
+          <div class="reveal">
+            <div class="rounded-[1.5rem] border border-white/10 bg-[#13283b] p-4 shadow-2xl sm:p-5">
+          <div class="mb-3 flex items-center justify-between gap-3">
+            <span id="simulator-location" class="text-[10px] font-bold uppercase tracking-[.15em] text-safety">Aula en acción</span>
+            <span class="flex items-center gap-1.5 text-[10px] text-slate-300"><span class="h-2 w-2 rounded-full bg-mint pulse-soft"></span> Simulación</span>
+          </div>
+          <svg id="simulator-scene" class="simulator-scene block w-full overflow-hidden rounded-xl" viewBox="0 0 420 250" role="img" aria-labelledby="simulator-title simulator-desc" data-action="idle" data-scene="classroom">
+            <title id="simulator-title">Simulación animada de un aula durante un sismo</title>
+            <desc id="simulator-desc">Una estudiante y sus compañeros practican cómo protegerse, evacuar y reunirse siguiendo las instrucciones.</desc>
+            <rect class="sim-room-element" width="420" height="250" rx="16" fill="#eaf0ef"/>
+            <path class="sim-room-element" d="M0 0h420v32H0Z" fill="#dbe5e2"/>
+            <g class="sim-room-element">
+              <rect x="22" y="46" width="93" height="67" rx="5" fill="#bfd5d2"/>
+              <path d="M68.5 46v67M22 79.5h93" stroke="#f4f7f5" stroke-width="5"/>
+            </g>
+            <g class="sim-room-element">
+              <rect x="294" y="45" width="102" height="70" rx="5" fill="#d4e1de"/>
+              <rect x="306" y="55" width="78" height="44" rx="3" fill="#637d88"/>
+              <text x="345" y="82" text-anchor="middle" fill="#f3bd71" font-family="DM Sans, sans-serif" font-size="12" font-weight="700">AGÁCHATE</text>
+            </g>
+            <path class="sim-room-element" d="M0 205h420v45H0Z" fill="#cfb28c"/>
+            <path class="sim-room-element" d="M0 205h420" stroke="#b48f68" stroke-width="4"/>
+            <g class="sim-plaza-scene">
+              <rect width="420" height="220" fill="#dcebe8"/>
+              <circle cx="353" cy="48" r="28" fill="#f1c47c" opacity=".8"/>
+              <path d="M0 116q85-36 168-4t154-1q49-20 98 0v52H0Z" fill="#b9d1c1"/>
+              <path d="M0 166h420v54H0Z" fill="#8fb59c"/>
+              <path d="M0 192q116-20 220-2t200-1v31H0Z" fill="#cfbc9d"/>
+              <path d="M18 146h91V76l-45-24-46 24Z" fill="#d5ded8" stroke="#849e96" stroke-width="2"/>
+              <path d="M11 78 64 43l53 35" fill="#e3a14e" stroke="#9e7042" stroke-width="3" stroke-linejoin="round"/>
+              <rect x="29" y="91" width="17" height="20" fill="#7595a0"/><rect x="72" y="91" width="17" height="20" fill="#7595a0"/>
+              <rect x="52" y="111" width="24" height="35" fill="#54717d"/>
+              <text x="64" y="160" text-anchor="middle" fill="#365849" font-family="DM Sans, sans-serif" font-size="9" font-weight="700">ESCUELA</text>
+              <path d="M128 155v-37m0 12c-20-17-20-31-3-39 14 9 15 21 3 39Zm0 10c17-17 30-16 36-2-8 15-20 17-36 2Z" fill="#688f76"/>
+              <path d="M330 155v-43m0 15c-21-19-20-35-3-45 17 10 18 26 3 45Zm0 12c18-18 31-16 38-1-8 15-22 16-38 1Z" fill="#688f76"/>
+              <path d="M18 181h384" stroke="#e9ddc9" stroke-width="3" stroke-dasharray="8 8"/>
+              <rect x="14" y="15" width="196" height="22" rx="11" fill="#10243a" fill-opacity=".88"/>
+              <text x="112" y="30" text-anchor="middle" fill="#fff" font-family="DM Sans, sans-serif" font-size="9" font-weight="700">PLAZA · PUNTO DE ENCUENTRO</text>
+            </g>
+            <g class="sim-evacuees" aria-hidden="true">
+              <g class="sim-evacuee" transform="translate(63 133)">
+                <g class="evacuee-body"><circle cy="0" r="4.5" fill="#a96f4d"/><path d="M-5 6q5-4 10 0l3 13h-16Z" fill="#e69f70"/></g>
+                <g class="evacuee-legs" fill="none" stroke="#405663" stroke-width="2.5" stroke-linecap="round"><path d="m-4 18-2 7m9-7 2 7"/></g>
+              </g>
+              <g class="sim-evacuee" transform="translate(51 136)">
+                <g class="evacuee-body"><circle cy="0" r="4.5" fill="#d2a27b"/><path d="M-5 6q5-4 10 0l3 13h-16Z" fill="#87bca9"/></g>
+                <g class="evacuee-legs" fill="none" stroke="#405663" stroke-width="2.5" stroke-linecap="round"><path d="m-4 18-2 7m9-7 2 7"/></g>
+              </g>
+              <g class="sim-evacuee" transform="translate(39 139)">
+                <g class="evacuee-body"><circle cy="0" r="4.5" fill="#704d3e"/><path d="M-5 6q5-4 10 0l3 13h-16Z" fill="#e5b553"/></g>
+                <g class="evacuee-legs" fill="none" stroke="#405663" stroke-width="2.5" stroke-linecap="round"><path d="m-4 18-2 7m9-7 2 7"/></g>
+              </g>
+            </g>
+            <g class="sim-hallway-scene">
+              <rect width="420" height="250" fill="#e9efed"/>
+              <path d="M0 0h420v31H0Z" fill="#d8e2df"/>
+              <path d="M0 190h420v60H0Z" fill="#cdb28f"/>
+              <path d="M0 190h420" stroke="#ae916b" stroke-width="4"/>
+              <path d="M24 49h219v119H24Z" fill="#dde7e3" stroke="#b8c8c3" stroke-width="3"/>
+              <path d="M37 62h192v92H37Z" fill="#c8dcd7"/>
+              <path d="M46 147h172" stroke="#fff" stroke-width="4" stroke-dasharray="10 8"/>
+              <text x="130" y="82" text-anchor="middle" fill="#536e70" font-family="DM Sans, sans-serif" font-size="11" font-weight="700">PASILLO</text>
+              <path d="M273 61h130v146H273Z" fill="#c5d1ce" stroke="#819492" stroke-width="4"/>
+              <path d="M285 75h105v132H285Z" fill="#405b65"/>
+              <path d="M299 88h77v119h-77Z" fill="#19384a"/>
+              <path d="M299 88h38.5v119H299Z" class="sim-elevator-door-left" fill="#a9bfba" stroke="#708681" stroke-width="2"/>
+              <path d="M337.5 88H376v119h-38.5Z" class="sim-elevator-door-right" fill="#bed0c9" stroke="#708681" stroke-width="2"/>
+              <path d="M335 142h5" stroke="#edf4ef" stroke-width="2" stroke-linecap="round"/>
+              <rect x="347" y="45" width="48" height="13" rx="6.5" fill="#10243a"/>
+              <text x="371" y="54" text-anchor="middle" fill="#f4a94f" font-family="DM Sans, sans-serif" font-size="8" font-weight="700">ASCENSOR</text>
+              <rect x="398" y="93" width="9" height="20" rx="3" fill="#e6a14e"/>
+            </g>
+            <g class="sim-student-secondary">
+              <circle cx="92" cy="145" r="13" fill="#9b6849"/>
+              <path d="M77 164q15-9 30 0l6 34H71Z" fill="#87bca9"/>
+              <path d="m79 197-3 10m28-10 3 10" stroke="#405663" stroke-width="6" stroke-linecap="round"/>
+            </g>
+            <g class="sim-teacher">
+              <circle cx="362" cy="145" r="13" fill="#704d3e"/>
+              <path d="M348 164q14-9 28 0l5 34h-38Z" fill="#e7a14e"/>
+              <path d="m350 196-2 11m23-11 2 11" stroke="#405663" stroke-width="6" stroke-linecap="round"/>
+              <path d="m350 168-11 13m26-13 12 9" stroke="#704d3e" stroke-width="5" stroke-linecap="round"/>
+            </g>
+            <g id="sim-student" class="sim-student">
+              <circle cx="215" cy="129" r="16" fill="#a96f4d"/>
+              <path d="M199 125q1-18 17-17 15 2 15 18l-7-8-22 4Z" fill="#242d37"/>
+              <path d="M197 149q18-12 36 0l7 42h-50Z" fill="#567f91"/>
+              <path d="m198 155-12 21m44-20 11 17" stroke="#a96f4d" stroke-width="7" stroke-linecap="round"/>
+              <path d="m203 189-3 17m25-17 4 17" stroke="#334858" stroke-width="8" stroke-linecap="round"/>
+              <path d="M191 207h12m23 0h12" stroke="#273946" stroke-width="6" stroke-linecap="round"/>
+            </g>
+            <g class="sim-student-secondary delay">
+              <circle cx="150" cy="151" r="11" fill="#d2a27b"/>
+              <path d="M138 166q12-8 24 0l4 29h-32Z" fill="#e69f70"/>
+              <path d="m140 194-2 10m19-10 2 10" stroke="#405663" stroke-width="5" stroke-linecap="round"/>
+            </g>
+            <path class="sim-room-element" d="M172 193h92v10h-92Zm8 10-3 15m77-15 3 15" fill="#b88758" stroke="#9e744f" stroke-width="2" stroke-linejoin="round"/>
+            <g class="sim-school-items">
+              <path d="M265 181q0-6 7-6h23q7 0 7 6v18h-37Z" fill="#d78357" stroke="#805844" stroke-width="2"/>
+              <path d="M271 180v-6q0-7 12-7t12 7v7m-30 6h32" fill="none" stroke="#805844" stroke-width="2.5" stroke-linecap="round"/>
+              <rect x="308" y="185" width="43" height="14" rx="6" fill="#e5b553" stroke="#92733e" stroke-width="2"/>
+              <path d="M319 185v-4h18v4m-8 3h7" fill="none" stroke="#92733e" stroke-width="2" stroke-linecap="round"/>
+              <text x="307" y="218" text-anchor="middle" fill="#405663" font-family="DM Sans, sans-serif" font-size="8" font-weight="700">BOLSO + CARTUCHERA</text>
+            </g>
+            <g class="sim-elevator-front sim-room-element">
+              <path class="sim-elevator-door-left" d="M319 204v-79q0-5 5-5h27v84Z" fill="#9bb0b0" stroke="#71878c" stroke-width="2" style="transform-box:fill-box;transform-origin:left center;transition:transform .65s ease"/>
+              <path class="sim-elevator-door-right" d="M351 120h29q5 0 5 5v79h-34Z" fill="#b5c5c3" stroke="#71878c" stroke-width="2" style="transform-box:fill-box;transform-origin:right center;transition:transform .65s ease"/>
+            </g>
+            <rect x="12" y="220" width="396" height="20" rx="10" fill="#10243a" fill-opacity=".92"/>
+            <text id="simulator-caption" x="210" y="234" text-anchor="middle" fill="#fff" font-family="DM Sans, sans-serif" font-size="10" font-weight="600">Elige una respuesta para ver qué hace el personaje</text>
+          </svg>
+          <p id="simulator-status" class="mt-3 min-h-8 text-xs leading-5 text-slate-300" aria-live="polite">La estudiante seguirá tus indicaciones. Si se equivoca, practicará la acción segura.</p>
+            </div>
+          </div>
+          <div class="reveal flex flex-col rounded-[1.5rem] border border-white/10 bg-white/[.06] p-5 shadow-2xl backdrop-blur sm:p-7">
+          <div class="mb-5 flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase tracking-[.15em] text-safety">Reto rápido · 3 preguntas</span>
+            <span id="quiz-step" class="text-xs font-semibold text-slate-300">Pregunta 1 de 3</span>
+            <span id="quiz-score" class="rounded-full bg-safety/15 px-3 py-1.5 text-[11px] font-bold text-safety" aria-live="polite">0 puntos</span>
+          </div>
+          <div class="mb-5 h-1.5 overflow-hidden rounded-full bg-white/10" role="progressbar" aria-label="Progreso del reto" aria-valuemin="0" aria-valuemax="3" aria-valuenow="1">
+            <div id="quiz-progress" class="progress-fill h-full w-1/3 rounded-full bg-safety"></div>
+          </div>
+          <div id="quiz-content" class="flex-1" aria-live="polite">
+            <h3 id="quiz-question" class="font-display text-lg font-bold leading-6 sm:text-xl">Comienza un sismo y estás en el aula. ¿Qué haces primero?</h3>
+            <div id="quiz-options" class="mt-4 grid gap-2.5"></div>
+            <p id="quiz-feedback" class="mt-4 min-h-6 text-sm leading-6 text-slate-300" aria-live="polite"></p>
+          </div>
+          <div class="mt-4 flex items-center justify-between gap-3 border-t border-white/10 pt-4">
+            <span class="text-[11px] text-slate-400">Sin presión: aquí venimos a aprender.</span>
+            <button id="quiz-next" type="button" class="rounded-full bg-safety px-5 py-2.5 text-xs font-bold text-ink transition hover:bg-[#ffc26e] disabled:cursor-not-allowed disabled:opacity-40" disabled>Siguiente →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="recursos" class="bg-paper py-24 sm:py-28">
+      <div class="mx-auto max-w-7xl px-5 sm:px-8">
+        <div class="reveal mb-12 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+          <div>
+            <p class="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.19em] text-[#bd7a2c]"><span class="h-px w-7 bg-safety"></span> Reto fuera de la pantalla</p>
+            <h2 class="font-display text-3xl font-extrabold tracking-[-.045em] text-ink sm:text-4xl">Explora tu escuela.</h2>
+          </div>
+          <p class="max-w-md text-sm leading-6 text-slateblue">¡Tres misiones cortas! Márcalas al completarlas con tu profe.</p>
+        </div>
+        <div class="reveal rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+          <div class="grid gap-3 md:grid-cols-3">
+            <label class="prep-task flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-4 transition hover:-translate-y-1 hover:border-[#e7a14a]">
+              <input class="mt-1 h-5 w-5 accent-[#e9a34b]" type="checkbox">
+              <span><strong class="block text-sm text-ink">🚪 Encuentra la salida</strong><span class="mt-1 block text-xs leading-5 text-slateblue">Busca el camino con tu profe.</span></span>
+            </label>
+            <label class="prep-task flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-4 transition hover:-translate-y-1 hover:border-[#e7a14a]">
+              <input class="mt-1 h-5 w-5 accent-[#e9a34b]" type="checkbox">
+              <span><strong class="block text-sm text-ink">🛡️ Practica cómo cubrirte</strong><span class="mt-1 block text-xs leading-5 text-slateblue">Agáchate, cúbrete y sujétate.</span></span>
+            </label>
+            <label class="prep-task flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-4 transition hover:-translate-y-1 hover:border-[#e7a14a]">
+              <input class="mt-1 h-5 w-5 accent-[#e9a34b]" type="checkbox">
+              <span><strong class="block text-sm text-ink">🌳 Ubica el punto de encuentro</strong><span class="mt-1 block text-xs leading-5 text-slateblue">Pregunta dónde se reunirá tu grupo.</span></span>
+            </label>
+          </div>
+          <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div class="h-3 flex-1 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-label="Retos practicados" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0">
+              <div id="prep-progress" class="h-full w-0 rounded-full bg-[#70ad8d] transition-all duration-500"></div>
+            </div>
+            <p id="prep-feedback" class="min-w-[220px] text-sm font-semibold text-slateblue" aria-live="polite">0 de 3 retos listos. ¡Vamos!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-[#eaf0ef] py-16">
+      <div class="mx-auto max-w-7xl px-5 sm:px-8">
+        <div class="reveal flex flex-col gap-6 rounded-[1.75rem] bg-[#dce9e4] p-7 sm:p-10 md:flex-row md:items-center md:justify-between">
+          <div class="max-w-2xl">
+            <p class="text-[10px] font-bold uppercase tracking-[.16em] text-[#527465]">Una comunidad que se prepara</p>
+            <h2 class="mt-2 font-display text-2xl font-extrabold tracking-[-.035em] text-ink sm:text-3xl">¡Ya sabes cómo ayudar!</h2>
+            <p class="mt-3 text-sm leading-6 text-slateblue">Practica con tu clase y sigue siempre las indicaciones de tu profe.</p>
+          </div>
+          <a href="#inicio" class="inline-flex shrink-0 items-center justify-center gap-3 rounded-full bg-ink px-6 py-3.5 text-sm font-bold text-white transition hover:bg-navy">Volver al inicio <span aria-hidden="true">↑</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-ink py-8 text-white">
+    <div class="mx-auto flex max-w-7xl flex-col gap-5 px-5 sm:px-8 md:flex-row md:items-center md:justify-between">
+      <a href="#inicio" class="flex items-center gap-2 font-display text-sm font-extrabold">territorio<span class="text-safety">seguro</span></a>
+      <p class="max-w-xl text-xs leading-5 text-slate-400">Sigue el plan de tu escuela y escucha a tu profe y a los adultos responsables.</p>
+      <span class="text-[10px] text-slate-500">Aprender · Prepararse · Cuidarnos</span>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const revealItems = document.querySelectorAll(".reveal");
+      if ("IntersectionObserver" in window) {
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12 });
+        revealItems.forEach((item) => revealObserver.observe(item));
+      } else {
+        revealItems.forEach((item) => item.classList.add("is-visible"));
+      }
+
+      const eventDialog = document.getElementById("event-dialog");
+      const eventDialogImage = document.getElementById("event-dialog-image");
+      const eventVisuals = {
+        "1812": {
+          image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Ruinas_de_la_iglesia_de_la_Sant%C3%ADsima_Trinidad_en_Caracas_-_Ferdinand_Bellermann.JPG/960px-Ruinas_de_la_iglesia_de_la_Sant%C3%ADsima_Trinidad_en_Caracas_-_Ferdinand_Bellermann.JPG?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail",
+          alt: "Pintura de las ruinas de la iglesia de la Santísima Trinidad en Caracas, obra de Ferdinand Bellermann.",
+          caption: "Pintura de Ferdinand Bellermann, realizada hacia 1842–1845, de ruinas en Caracas asociadas al terremoto de 1812. Es una representación posterior, no una fotografía del día del sismo.",
+          imageSource: "https://commons.wikimedia.org/wiki/File:Ruinas_de_la_iglesia_de_la_Sant%C3%ADsima_Trinidad_en_Caracas_-_Ferdinand_Bellermann.JPG",
+          source: "https://doi.org/10.1130/2010.2471(05)",
+          details: "Los sismos del Jueves Santo afectaron gravemente Caracas y otras poblaciones. La magnitud ≈7,7 es una estimación retrospectiva: en 1812 no había instrumentos modernos y las reconstrucciones históricas varían."
+        },
+        "1900": {
+          image: "diagram-1900",
+          alt: "Esquema didáctico de viviendas dañadas, basado en los reportes del sismo de Caracas de 1900; no es una fotografía de archivo.",
+          caption: "Esquema didáctico de daños en viviendas. No se encontró una fotografía del terremoto con procedencia verificable; el dibujo no representa un edificio específico.",
+          imageSource: "https://earthquake.usgs.gov/earthquakes/eventpage/cent19001029091100000",
+          source: "https://earthquake.usgs.gov/earthquakes/eventpage/cent19001029091100000",
+          details: "El sismo de San Narciso afectó Caracas y localidades cercanas. Los registros históricos describen daños en viviendas y edificios de la región central; esta ilustración solo ayuda a visualizar ese tipo de daño y no es una foto del evento."
+        },
+        "1967": {
+          image: "diagram-1967",
+          alt: "Esquema didáctico de un edificio con pisos colapsados, inspirado en daños reportados en Caracas en 1967; no es una fotografía.",
+          caption: "Esquema de colapso estructural basado en daños descritos para 1967. No es una fotografía del edificio ni reproduce una escena histórica concreta.",
+          imageSource: "https://es.wikipedia.org/wiki/Terremoto_de_Caracas_de_1967",
+          source: "https://es.wikipedia.org/wiki/Terremoto_de_Caracas_de_1967",
+          details: "El terremoto afectó con fuerza Altamira, Los Palos Grandes y el litoral central. Entre los daños documentados se cuentan edificios con pisos destruidos y estructuras que colapsaron; el esquema no es una fotografía del desastre."
+        },
+        "1997": {
+          image: "https://upload.wikimedia.org/wikipedia/commons/c/c5/1997_Cariaco_earthquake_ShakeMap.jpg",
+          alt: "Mapa de intensidad sísmica estimada para el terremoto de Cariaco de 1997, publicado por el USGS.",
+          caption: "ShakeMap del USGS: representa la intensidad estimada del movimiento en la región, no una fotografía de edificios dañados.",
+          imageSource: "https://commons.wikimedia.org/wiki/File:1997_Cariaco_earthquake_ShakeMap.jpg",
+          source: "https://earthquake.usgs.gov/earthquakes/eventpage/usp00084m2",
+          details: "El terremoto de Cariaco causó daños graves en el estado Sucre, incluyendo colapsos en centros educativos y viviendas. El mapa del USGS permite observar la intensidad estimada del movimiento; la magnitud registrada en la ficha es Mwc 7,0."
+        },
+        "2026": {
+          images: [
+            {
+              image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/Two_earthquakes_leave_severe_damage_across_northern_Venezuela_%28P-070474-00-02%29.jpg/1280px-Two_earthquakes_leave_severe_damage_across_northern_Venezuela_%28P-070474-00-02%29.jpg",
+              alt: "Mapa satelital de evaluación de daños en Caraballeda, con estructuras afectadas, destruidas y carreteras bloqueadas tras los sismos de 2026.",
+              caption: "Evaluación Copernicus EMS del 26 de junio: identifica 890 estructuras potencialmente afectadas y 42 carreteras bloqueadas en el área mostrada. Visualización satelital de daños, no fotografía a nivel de calle. © Unión Europea, 2026 · CC BY 4.0.",
+              imageSource: "https://commons.wikimedia.org/wiki/File:Two_earthquakes_leave_severe_damage_across_northern_Venezuela_(P-070474-00-02).jpg"
+            },
+            {
+              image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Sentinel-1_shows_ground_displacement_after_Venezuela_earthquakes_ESA523458.jpg/1280px-Sentinel-1_shows_ground_displacement_after_Venezuela_earthquakes_ESA523458.jpg",
+              alt: "Interferograma satelital Sentinel-1 del desplazamiento del terreno entre el 18 y el 25 de junio de 2026 en el norte de Venezuela.",
+              caption: "Interferograma Sentinel-1: muestra deformación del terreno entre el 18 y el 25 de junio cerca de Caracas y La Guaira; no es una fotografía de edificios. © Datos Copernicus Sentinel, 2026 · ESA.",
+              imageSource: "https://commons.wikimedia.org/wiki/File:Sentinel-1_shows_ground_displacement_after_Venezuela_earthquakes_ESA523458.jpg"
+            }
+          ],
+          source: "https://earthquake.usgs.gov/earthquakes/eventpage/us6000t7zp",
+          details: "El catálogo del USGS registra un evento precursor de magnitud 7,2 seguido por el sismo principal de magnitud 7,5. Explora las imágenes para ver la evaluación satelital de daños en Caraballeda y la deformación del terreno observada por Sentinel-1."
+        }
+      };
+      let eventDialogOpener = null;
+      let activeEventImages = [];
+      let activeEventImageIndex = 0;
+
+      function escapeSvg(value) {
+        return value.replace(/[&<>"']/g, (character) => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;"
+        })[character]);
+      }
+
+      function createDamageDiagram(year) {
+        const buildings = year === "1900"
+          ? `<path d="M62 202h175v118H62Z" fill="#dfc9a8"/><path d="m50 204 101-83 101 83" fill="#9b6749"/><path d="M99 235h39v85H99Zm83-17h39v37h-39Z" fill="#6d7774"/><path d="m236 258 26-18 28 20m-54 15 33-14 30 22" fill="none" stroke="#a75543" stroke-width="8" stroke-linecap="round"/>`
+          : `<path d="M100 92h167v226H100Z" fill="#dce5df"/><path d="M86 96h195v15H86Zm0 58h195v14H86Zm0 58h195v14H86Zm0 58h195v14H86Z" fill="#e6a14e"/><path d="M120 124h28v23h-28zm50 0h28v23h-28zm50 0h28v23h-28zm-100 58h28v22h-28zm50 0h28v22h-28zm50 0h28v22h-28z" fill="#587586"/><path d="m101 205 72 22-15 17 58 16-28 25 78 22v-75l-195-18Z" fill="#a75543"/><path d="m148 211 44-16m-14 48 50-18m-16 51 49-18" stroke="#f5f7f8" stroke-width="7"/>`;
+        const place = year === "1900" ? "CARACAS · 1900" : "CARACAS · 1967";
+        const detail = year === "1900" ? "VIVIENDAS DAÑADAS" : "COLAPSO DE PISOS";
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 360">
+          <defs><linearGradient id="paper" x2="0" y2="1"><stop stop-color="#f0e2c7"/><stop offset="1" stop-color="#d8c09c"/></linearGradient></defs>
+          <rect width="760" height="360" fill="url(#paper)"/>
+          <path d="M0 318h760" stroke="#8c7358" stroke-width="4"/>
+          <path d="M15 292q100-24 196 0t195 0 196 0 158 0v28H15Z" fill="#aa9274" opacity=".65"/>
+          ${buildings}
+          <path d="M325 318v-102h96v102m-84-83h72m-72 27h72m-72 27h72m-55-54v27m38-27v27m-38 0v27m38-27v27" fill="none" stroke="#7b6953" stroke-width="5"/>
+          <path d="M520 318v-85h101v85m-87-62h73m-73 24h73" fill="none" stroke="#8c7358" stroke-width="7"/>
+          <rect x="28" y="24" width="245" height="38" rx="19" fill="#10243a"/>
+          <text x="48" y="49" fill="#f4a94f" font-family="Arial,sans-serif" font-size="16" font-weight="700">${place}</text>
+          <rect x="28" y="276" width="250" height="48" rx="12" fill="#10243a"/>
+          <text x="44" y="297" fill="#fff" font-family="Arial,sans-serif" font-size="14" font-weight="700">${detail}</text>
+          <text x="44" y="315" fill="#d5e0e3" font-family="Arial,sans-serif" font-size="10">ESQUEMA DOCUMENTAL · NO ES FOTOGRAFÍA</text>
+        </svg>`;
+        return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+      }
+
+      function showEventImage(index) {
+        activeEventImageIndex = index;
+        const visual = activeEventImages[index];
+        eventDialogImage.src = visual.image;
+        eventDialogImage.alt = visual.alt;
+        document.getElementById("event-dialog-caption").textContent = visual.caption;
+        document.getElementById("event-dialog-image-source").href = visual.imageSource;
+        document.getElementById("event-gallery-position").textContent = `Imagen ${index + 1} de ${activeEventImages.length}`;
+      }
+
+      document.querySelectorAll(".timeline-card").forEach((card) => {
+        card.setAttribute("aria-haspopup", "dialog");
+        card.setAttribute("aria-controls", "event-dialog");
+        card.removeAttribute("aria-expanded");
+        card.title = "Abrir ilustración y ficha del evento";
+        const icon = card.querySelector("span[aria-hidden='true']");
+        if (icon) icon.textContent = "↗";
+        card.addEventListener("click", () => {
+          const year = card.closest(".timeline-item").querySelector(".font-display").textContent.trim();
+          const summary = Array.from(card.querySelector(".flex > span").children);
+          const title = summary[0].textContent.trim();
+          const eventMeta = summary[1].textContent.trim();
+          const magnitude = summary[2].textContent.trim();
+          const visual = eventVisuals[year];
+          activeEventImages = visual.images || [{
+            image: visual.image.startsWith("diagram-") ? createDamageDiagram(year) : visual.image,
+            alt: visual.alt,
+            caption: visual.caption,
+            imageSource: visual.imageSource
+          }];
+          document.getElementById("event-dialog-year").textContent = `Memoria sísmica · ${year}`;
+          document.getElementById("event-dialog-title").textContent = title;
+          document.getElementById("event-dialog-meta").textContent = `${eventMeta} · ${magnitude}`;
+          document.getElementById("event-dialog-copy").textContent = visual.details;
+          document.getElementById("event-gallery-controls").hidden = activeEventImages.length < 2;
+          showEventImage(0);
+          const sourceLink = document.getElementById("event-dialog-source");
+          sourceLink.href = visual.source;
+          eventDialogOpener = card;
+          eventDialog.showModal();
+        });
+      });
+
+      document.getElementById("event-gallery-previous").addEventListener("click", () => {
+        showEventImage((activeEventImageIndex - 1 + activeEventImages.length) % activeEventImages.length);
+      });
+      document.getElementById("event-gallery-next").addEventListener("click", () => {
+        showEventImage((activeEventImageIndex + 1) % activeEventImages.length);
+      });
+      document.getElementById("event-dialog-close").addEventListener("click", () => eventDialog.close());
+      eventDialogImage.addEventListener("error", () => {
+        document.getElementById("event-dialog-caption").textContent += " No se pudo cargar la imagen; abre la fuente para consultarla.";
+      });
+      eventDialog.addEventListener("click", (event) => {
+        if (event.target === eventDialog) eventDialog.close();
+      });
+      eventDialog.addEventListener("close", () => {
+        if (eventDialogOpener) eventDialogOpener.focus();
+        eventDialogOpener = null;
+      });
+
+      document.querySelectorAll(".timeline-filter").forEach((filterButton) => {
+        filterButton.addEventListener("click", () => {
+          const filter = filterButton.dataset.filter;
+          document.querySelectorAll(".timeline-filter").forEach((button) => {
+            const active = button === filterButton;
+            button.setAttribute("aria-pressed", String(active));
+            button.className = active
+              ? "timeline-filter rounded-full border border-ink bg-ink px-4 py-2 text-xs font-semibold text-white"
+              : "timeline-filter rounded-full border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-500";
+          });
+          document.querySelectorAll(".timeline-item").forEach((item) => {
+            item.classList.toggle("is-muted", filter !== "all" && item.dataset.region !== filter);
+          });
+        });
+      });
+
+      const mapCopy = {
+        school: ["La escuela", "Fíjate dónde están las salidas y qué objetos podrían caerse."],
+        route: ["Camino de salida", "Practica este camino con tu profe. Cuando toque salir, camina sin correr."],
+        safe: ["La plaza", "Este dibujo es un ejemplo. Tu profe te dirá cuál es el punto de encuentro de verdad."]
+      };
+      document.querySelectorAll(".map-filter").forEach((filterButton) => {
+        filterButton.addEventListener("click", () => {
+          const selected = filterButton.dataset.mapFilter;
+          document.querySelectorAll(".map-filter").forEach((button) => {
+            const active = button === filterButton;
+            button.setAttribute("aria-pressed", String(active));
+            button.className = active
+              ? "map-filter rounded-full bg-ink px-3.5 py-2 text-xs font-semibold text-white"
+              : "map-filter rounded-full bg-white px-3.5 py-2 text-xs font-semibold text-slate-600 ring-1 ring-slate-200";
+          });
+          document.querySelectorAll(".map-zone").forEach((zone) => {
+            zone.classList.toggle("is-active", zone.dataset.map === selected || (selected === "safe" && zone.dataset.map === "safe"));
+          });
+          document.getElementById("map-info-title").textContent = mapCopy[selected][0];
+          document.getElementById("map-info-copy").textContent = mapCopy[selected][1];
+        });
+      });
+
+      const protocolTabs = Array.from(document.querySelectorAll(".protocol-tab"));
+      protocolTabs.forEach((tab, index) => {
+        tab.addEventListener("click", () => activateProtocolTab(tab));
+        tab.addEventListener("keydown", (event) => {
+          let nextIndex = index;
+          if (event.key === "ArrowRight") nextIndex = (index + 1) % protocolTabs.length;
+          else if (event.key === "ArrowLeft") nextIndex = (index - 1 + protocolTabs.length) % protocolTabs.length;
+          else if (event.key === "Home") nextIndex = 0;
+          else if (event.key === "End") nextIndex = protocolTabs.length - 1;
+          else return;
+          event.preventDefault();
+          activateProtocolTab(protocolTabs[nextIndex]);
+          protocolTabs[nextIndex].focus();
+        });
+      });
+
+      function activateProtocolTab(activeTab) {
+        protocolTabs.forEach((tab) => {
+          const active = tab === activeTab;
+          tab.setAttribute("aria-selected", String(active));
+          tab.tabIndex = active ? 0 : -1;
+          document.getElementById(tab.getAttribute("aria-controls")).hidden = !active;
+        });
+      }
+
+      const quizQuestions = [
+        {
+          question: "Estás en clase y empieza a temblar. ¿Qué haces?",
+          options: ["Corro hacia la puerta.", "Me agacho, me cubro y me sujeto.", "Me acerco a la ventana."],
+          actions: ["run", "cover", "window"],
+          actionLabels: ["Corre hacia la puerta", "Se agacha y se cubre", "Se acerca a la ventana"],
+          answer: 1,
+          correction: "Agáchate, cúbrete y sujétate hasta que pare de temblar.",
+          feedback: "¡Eso es! Quédate protegido hasta que pare de temblar."
+        },
+        {
+          question: "Ya dejó de temblar. ¿Cómo sales del aula?",
+          options: ["Bajo por el ascensor.", "Espero a mi profe y salgo caminando con mi grupo.", "Regreso por mi bolso."],
+          actions: ["elevator", "evacuate", "belongings"],
+          actionLabels: ["Corre al ascensor", "Sale caminando con el grupo", "Regresa por su bolso"],
+          answer: 1,
+          correction: "Espera a tu profe y sal caminando con tu grupo. No uses ascensores.",
+          feedback: "¡Muy bien! Camina con tu grupo y sigue a tu profe."
+        },
+        {
+          question: "Ya estás en el punto de encuentro. ¿Qué haces?",
+          options: ["Me voy solo a buscar a mis amigos.", "Me quedo con mi grupo y escucho a mi profe.", "Vuelvo al edificio."],
+          actions: ["separate", "stay", "return"],
+          actionLabels: ["Se separa del grupo", "Se queda con su grupo", "Regresa al edificio"],
+          answer: 1,
+          correction: "Quédate con tu grupo y escucha a tu profe. No vuelvas al edificio.",
+          feedback: "¡Excelente! Quédate con tu grupo y escucha a tu profe."
+        }
+      ];
+      let questionIndex = 0;
+      let score = 0;
+      let answered = false;
+      const quizQuestion = document.getElementById("quiz-question");
+      const quizOptions = document.getElementById("quiz-options");
+      const quizFeedback = document.getElementById("quiz-feedback");
+      const quizNext = document.getElementById("quiz-next");
+      const quizStep = document.getElementById("quiz-step");
+      const quizScore = document.getElementById("quiz-score");
+      const quizProgress = document.getElementById("quiz-progress");
+      const progressBar = document.querySelector('[role="progressbar"]');
+      const simulatorScene = document.getElementById("simulator-scene");
+      const simulatorCaption = document.getElementById("simulator-caption");
+      const simulatorStatus = document.getElementById("simulator-status");
+      const simulatorLocation = document.getElementById("simulator-location");
+      let correctionTimer;
+      let actionTimer;
+
+      function startCameraShake() {
+        simulatorScene.classList.remove("is-shaking");
+        void simulatorScene.getBoundingClientRect();
+        simulatorScene.classList.add("is-shaking");
+      }
+
+      function renderQuestion() {
+        clearTimeout(correctionTimer);
+        clearTimeout(actionTimer);
+        simulatorScene.classList.remove("is-shaking");
+        simulatorScene.dataset.motion = "";
+        simulatorScene.dataset.action = "idle";
+        const atMeetingPoint = questionIndex === 2;
+        simulatorScene.dataset.scene = atMeetingPoint ? "plaza" : "classroom";
+        simulatorLocation.textContent = atMeetingPoint ? "¡Llegaron a la plaza!" : "¡Mira cómo se mueve el aula!";
+        simulatorScene.querySelector("#simulator-title").textContent = atMeetingPoint
+          ? "Simulación animada de estudiantes reunidos en la plaza después de evacuar"
+          : "Simulación animada de un aula durante un sismo";
+        simulatorScene.querySelector("#simulator-desc").textContent = atMeetingPoint
+          ? "Unos estudiantes pequeños salen caminando de la escuela hacia la plaza, donde se reúnen con su grupo."
+          : "Una estudiante y sus compañeros practican cómo protegerse y evacuar siguiendo las instrucciones.";
+        simulatorCaption.textContent = atMeetingPoint
+          ? "El grupo llegó al punto de encuentro"
+          : "Elige una respuesta para ayudarla";
+        simulatorStatus.textContent = atMeetingPoint
+          ? "Mira cómo sus compañeros salen caminando hacia la plaza. ¿Qué debería hacer el grupo?"
+          : questionIndex === 0
+            ? "El temblor empieza suave y se hace más fuerte. ¡Ayúdala!"
+          : "Elige qué hacer y mira qué pasa.";
+        const current = quizQuestions[questionIndex];
+        answered = false;
+        quizStep.textContent = `Reto ${questionIndex + 1} de ${quizQuestions.length}`;
+        quizScore.textContent = `${score} ⭐`;
+        quizProgress.style.width = `${((questionIndex + 1) / quizQuestions.length) * 100}%`;
+        progressBar.setAttribute("aria-valuenow", String(questionIndex + 1));
+        quizQuestion.textContent = current.question;
+        quizFeedback.textContent = "";
+        quizNext.disabled = true;
+        quizNext.textContent = questionIndex === quizQuestions.length - 1 ? "Ver resultado →" : "Siguiente →";
+        quizOptions.replaceChildren();
+
+        current.options.forEach((option, optionIndex) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "quiz-option flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/[.045] p-4 text-left text-sm text-slate-200 sm:text-base";
+          const optionIcons = [["🏃", "🛡️", "🪟"], ["🛗", "🚶", "🎒"], ["👋", "👫", "🏫"]];
+          button.innerHTML = `<span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/10 text-xl" aria-hidden="true">${optionIcons[questionIndex][optionIndex]}</span><span class="grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-white/15 text-[11px] font-bold text-slate-400" aria-hidden="true">${String.fromCharCode(65 + optionIndex)}</span><span></span>`;
+          button.querySelector("span:last-child").textContent = option;
+          button.addEventListener("click", () => chooseAnswer(button, optionIndex));
+          quizOptions.append(button);
+        });
+        if (questionIndex === 0) startCameraShake();
+      }
+
+      function chooseAnswer(button, selectedIndex) {
+        if (answered) return;
+        answered = true;
+        const current = quizQuestions[questionIndex];
+        const correct = selectedIndex === current.answer;
+        const selectedAction = current.actions[selectedIndex];
+        const actionLabel = current.actionLabels[selectedIndex];
+        simulatorScene.dataset.action = selectedAction;
+        simulatorScene.dataset.motion = selectedAction === "elevator" ? "exit" : selectedAction === "belongings" ? "pickup" : "";
+        simulatorCaption.textContent = selectedAction === "elevator" ? "Corre hacia la salida" : actionLabel;
+        simulatorStatus.textContent = selectedAction === "elevator"
+          ? "Corre hacia la salida del salón."
+          : selectedAction === "run"
+            ? "Corre hacia la puerta mientras el aula sigue temblando."
+            : selectedAction === "belongings"
+              ? "Se detiene por su bolso y deja de salir con el grupo."
+            : `La estudiante ${actionLabel.toLowerCase()}.`;
+        if (selectedAction === "run") {
+            startCameraShake();
+        } else if (selectedAction === "elevator") {
+          actionTimer = setTimeout(() => {
+            simulatorScene.dataset.motion = "hallway";
+            simulatorCaption.textContent = "Busca un ascensor";
+            simulatorStatus.textContent = "Sale al pasillo y busca un ascensor.";
+            actionTimer = setTimeout(() => {
+              simulatorScene.dataset.motion = "search";
+              simulatorStatus.textContent = "Encuentra el ascensor y se acerca.";
+              actionTimer = setTimeout(() => {
+                simulatorScene.dataset.motion = "inside";
+                simulatorCaption.textContent = "Entra en el ascensor";
+                simulatorStatus.textContent = "Se metió en el ascensor. No lo uses: espera a tu profe y evacúa caminando.";
+              }, 1000);
+            }, 250);
+          }, 1100);
+        } else if (selectedAction === "belongings") {
+          actionTimer = setTimeout(() => {
+            simulatorScene.dataset.motion = "picked-up";
+            simulatorStatus.textContent = "Tomó su bolso y se retrasó. Al salir, deja tus cosas y sigue a tu grupo.";
+          }, 750);
+        }
+        if (correct) score += 1;
+        quizOptions.querySelectorAll("button").forEach((option, index) => {
+          option.disabled = true;
+          if (index === current.answer) option.classList.add("is-correct");
+          else if (index === selectedIndex) option.classList.add("is-wrong");
+        });
+        quizScore.textContent = `${score} ⭐`;
+        quizFeedback.textContent = correct
+          ? current.feedback
+          : `¡Vamos a intentarlo de forma segura! ${current.correction}`;
+        if (!correct) {
+          correctionTimer = setTimeout(() => {
+            clearTimeout(actionTimer);
+            simulatorScene.dataset.motion = "";
+            simulatorScene.dataset.action = current.actions[current.answer];
+            simulatorCaption.textContent = `Corrección: ${current.actionLabels[current.answer]}`;
+            simulatorStatus.textContent = `¡Lo aprendió! ${current.correction}`;
+            quizNext.disabled = false;
+          }, selectedAction === "elevator" ? 5000 : selectedAction === "belongings" ? 1700 : 1100);
+        }
+        quizNext.disabled = !correct;
+      }
+
+      quizNext.addEventListener("click", () => {
+        if (!answered) return;
+        if (questionIndex < quizQuestions.length - 1) {
+          questionIndex += 1;
+          renderQuestion();
+          quizQuestion.focus?.();
+        } else {
+          showQuizResult();
+        }
+      });
+
+      function showQuizResult() {
+        quizStep.textContent = "¡Misión cumplida!";
+        quizScore.textContent = `${score} ⭐ de ${quizQuestions.length}`;
+        quizProgress.style.width = "100%";
+        progressBar.setAttribute("aria-valuenow", String(quizQuestions.length));
+        const heading = score === quizQuestions.length ? "¡Eres un gran compañero!" : score >= 2 ? "¡Vas muy bien!" : "¡Cada intento te enseña!";
+        const message = score === quizQuestions.length
+          ? "Ya sabes cómo ayudar. Practícalo también con tu clase."
+          : "Vuelve a jugar y practica con tu clase.";
+        quizQuestion.textContent = heading;
+        quizOptions.replaceChildren();
+        quizFeedback.textContent = `${score} de ${quizQuestions.length} estrellas. ${message}`;
+        quizNext.disabled = false;
+        quizNext.textContent = "Intentar de nuevo ↻";
+        quizNext.onclick = () => {
+          questionIndex = 0;
+          score = 0;
+          quizNext.onclick = null;
+          renderQuestion();
+          quizQuestion.focus();
+        };
+      }
+
+      renderQuestion();
+
+      const prepChecks = Array.from(document.querySelectorAll(".prep-task input"));
+      const prepProgress = document.getElementById("prep-progress");
+      const prepProgressBar = prepProgress.closest('[role="progressbar"]');
+      const prepFeedback = document.getElementById("prep-feedback");
+      prepChecks.forEach((checkbox) => {
+        checkbox.addEventListener("change", () => {
+          const completed = prepChecks.filter((check) => check.checked).length;
+          checkbox.closest(".prep-task").classList.toggle("is-complete", checkbox.checked);
+          prepProgress.style.width = `${(completed / prepChecks.length) * 100}%`;
+          prepProgressBar.setAttribute("aria-valuenow", String(completed));
+          prepFeedback.textContent = completed === prepChecks.length
+            ? "¡Misión cumplida! Ya conoces tu escuela."
+            : `${completed} de 3 retos listos. ${completed === 0 ? "¡Vamos!" : "¡Sigue así!"}`;
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
